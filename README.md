@@ -20,7 +20,7 @@
 ## Usage
 
 ```
-WORK &&
+export WORK &&
     BIN &&
     docker \
         run \
@@ -54,6 +54,8 @@ docker \
     --rm \
     --volume /dev/vboxdrv:/dev/vboxdrv:ro \
     --entrypoint VBoxManage \
+    --volume \${WORK}:/usr/local/src \
+    --workdir /usr/local/src \
     tidyrailroad/virtualbox:0.0.0 \
     \${@}
 EOF
@@ -85,6 +87,7 @@ vagrant(){
         --workdir /usr/local/src \
         --volume ${BIN}:/usr/local/bin:ro \
         --env VAGRANT_DEFAULT_PROVIDER=virtualbox \
+        --env WORK \
         tidyrailroad/vagrant:0.0.0 \
         ${@}
 }
