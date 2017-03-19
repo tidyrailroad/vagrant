@@ -21,6 +21,7 @@
 
 ```
 export WORK &&
+    VAGRANTD &&
     BIN &&
     docker \
         run \
@@ -53,9 +54,9 @@ docker \
     --interactive \
     --rm \
     --volume /dev/vboxdrv:/dev/vboxdrv:ro \
-    --entrypoint VBoxManage \
     --volume \${WORK}:/usr/local/src \
     --workdir /usr/local/src \
+    --entrypoint VBoxManage \
     tidyrailroad/virtualbox:0.0.0 \
     \${@}
 EOF
@@ -86,6 +87,7 @@ vagrant(){
         --volume ${WORK}:/usr/local/src \
         --workdir /usr/local/src \
         --volume ${BIN}:/usr/local/bin:ro \
+        --volume ${VAGRANTD}:/root/.vagrant.d \
         --env VAGRANT_DEFAULT_PROVIDER=virtualbox \
         --env WORK \
         tidyrailroad/vagrant:0.0.0 \
