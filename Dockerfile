@@ -15,7 +15,7 @@
 #    along with vagrant.  If not, see <http://www.gnu.org/licenses/>.
 FROM centos:7.3.1611
 MAINTAINER Emory Merryman emory.merryman@gmail.com
-COPY run.sh VirtualBox.sh /opt/docker/
+COPY run.sh /opt/docker/
 RUN ["/usr/bin/sh", "/opt/docker/run.sh"]
 ENTRYPOINT ["vagrant"]
 CMD []
