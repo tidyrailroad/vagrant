@@ -21,8 +21,10 @@
 
 ```
 export WORK &&
-    VAGRANTD &&
+    export VAGRANTD &&
     BIN &&
+    export VIRTUAL_BOX_VMS &&
+    export CONFIG &&
     docker \
         run \
         --interactive \
@@ -49,6 +51,7 @@ export WORK &&
     tee VBoxManage <<EOF
 #!/bin/sh
 
+echo \${0} -- \${@} >> /tmp/log.txt &&
 docker \
     run \
     --interactive \
@@ -57,8 +60,11 @@ docker \
     --volume \${WORK}:/usr/local/src \
     --workdir /usr/local/src \
     --entrypoint VBoxManage \
+    --volume \${VAGRANTD}:/root/.vagrant.d \
+    --volume "\${VIRTUAL_BOX_VMS}:/root/VirtualBox VMs" \
+    --volume \${CONFIG}:/root/.config \
     tidyrailroad/virtualbox:0.0.0 \
-    \${@}
+    "\${@}"
 EOF
 ) &&
     docker \
@@ -88,8 +94,12 @@ vagrant(){
         --workdir /usr/local/src \
         --volume ${BIN}:/usr/local/bin:ro \
         --volume ${VAGRANTD}:/root/.vagrant.d \
+        --volume ${CONFIG}:/root/.config \
         --env VAGRANT_DEFAULT_PROVIDER=virtualbox \
         --env WORK \
+        --env VAGRANTD \
+        --env VIRTUAL_BOX_VMS \
+        --env CONFIG \
         tidyrailroad/vagrant:0.0.0 \
         ${@}
 }
