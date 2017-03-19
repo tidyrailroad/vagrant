@@ -31,7 +31,7 @@ WORK &&
         --volume ${WORK}:/usr/local/src \
         --workdir /usr/local/src \
         --volume ${BIN}:/usr/local/bin:ro \
-        --env VAGRANT_DEFAULT_PROVIDER=virtualbox
+        --env VAGRANT_DEFAULT_PROVIDER=virtualbox \
         tidyrailroad/vagrant:0.0.0
 ```
 
@@ -46,15 +46,16 @@ WORK &&
     --workdir /usr/local/src \
     alpine:3.4 \
     tee VBoxManage <<EOF
-#!/bin
+#!/bin/sh
 
 docker \
     run \
     --interactive \
-    --tty \
     --rm \
     --volume /dev/vboxdrv:/dev/vboxdrv:ro \
-    tidyrailroad/virtualbox:1.0.0
+    --entrypoint VBoxManage \
+    tidyrailroad/virtualbox:0.0.0 \
+    \${@}
 EOF
 ) &&
     docker \
@@ -82,7 +83,8 @@ vagrant(){
         --volume /var/run/docker.sock:/var/run/docker.sock:ro \
         --volume ${WORK}:/usr/local/src \
         --workdir /usr/local/src \
-        --env DISPLAY \
+        --volume ${BIN}:/usr/local/bin:ro \
+        --env VAGRANT_DEFAULT_PROVIDER=virtualbox \
         tidyrailroad/vagrant:0.0.0 \
         ${@}
 }

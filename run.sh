@@ -22,6 +22,7 @@ yum update --assumeyes &&
     yum remove --assumeyes wget &&
     yum update --assumeyes &&
     yum install --assumeyes ${DOWNLOAD_DIR}/vagrant_1.9.2_x86_64.rpm &&
+    rm --recursive --force ${DOWNLOAD_DIR} &&
     yum update --assumeyes &&
     yum install --assumeyes docker &&
     yum update --assumeyes &&
