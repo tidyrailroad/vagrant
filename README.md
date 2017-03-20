@@ -40,6 +40,7 @@ export WORK &&
 docker \
     run \
     --cidfile /root/virtualbox.cidfile \
+    --privileged \
     --detach \
     --volume /tmp/.X11-unix:/tmp/.X11-unix:ro \
     --env DISPLAY \
