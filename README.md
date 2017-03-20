@@ -46,6 +46,7 @@ docker \
     --volume /dev/vboxdrv:/dev/vboxdrv:ro \
     --volume \${WORK}:/root \
     --workdir /root \
+    --net host \
     tidyrailroad/virtualbox:0.0.0
 EOF
 ) &&
@@ -95,6 +96,7 @@ vagrant(){
         --env VAGRANT_DEFAULT_PROVIDER=virtualbox \
         --env WORK \
         --env DISPLAY \
+        --net host \
         --entrypoint bash \
         tidyrailroad/vagrant:0.0.0 \
         ${@}
