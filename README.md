@@ -21,21 +21,7 @@
 
 ```
 export WORK &&
-    export VAGRANTD &&
-    BIN &&
-    export VIRTUAL_BOX_VMS &&
-    export CONFIG &&
-    docker \
-        run \
-        --interactive \
-        --tty \
-        --rm \
-        --volume /var/run/docker.sock:/var/run/docker.sock:ro \
-        --volume ${WORK}:/usr/local/src \
-        --workdir /usr/local/src \
-        --volume ${BIN}:/usr/local/bin:ro \
-        --env VAGRANT_DEFAULT_PROVIDER=virtualbox \
-        tidyrailroad/vagrant:0.0.0
+    BIN
 ```
 
 ### Preparing the VirtualBox volume
@@ -48,34 +34,47 @@ export WORK &&
     --volume ${BIN}:/usr/local/src \
     --workdir /usr/local/src \
     alpine:3.4 \
-    tee VBoxManage <<EOF
+    tee init <<EOF
 #!/bin/sh
 
-echo \${0} -- \${@} >> /tmp/log.txt &&
 docker \
     run \
-    --interactive \
-    --rm \
+    --cidfile /root/virtualbox.cidfile \
+    --detach \
+    --volume /tmp/.X11-unix:/tmp/.X11-unix:ro \
+    --env DISPLAY \
     --volume /dev/vboxdrv:/dev/vboxdrv:ro \
-    --volume \${WORK}:/usr/local/src \
-    --workdir /usr/local/src \
-    --entrypoint VBoxManage \
-    --volume \${VAGRANTD}:/root/.vagrant.d \
-    --volume "\${VIRTUAL_BOX_VMS}:/root/VirtualBox VMs" \
-    --volume \${CONFIG}:/root/.config \
-    tidyrailroad/virtualbox:0.0.0 \
-    "\${@}"
+    --volume \${WORK}:/root \
+    --workdir /root \
+    tidyrailroad/virtualbox:0.0.0
 EOF
 ) &&
+    (docker \
+        run \
+        --interactive \
+        --rm \
+        --volume ${BIN}:/usr/local/src \
+        --workdir /usr/local/src \
+        alpine:3.4 \
+        tee VBoxManage <<EOF
+#!/bin/sh
+
+docker \
+    exec \
+    \$(cat /root/virtualbox.cidfile) \
+    VBoxManage \
+    "\${@}"
+EOF
+    ) &&
     docker \
         run \
         --interactive \
         --tty \
         --rm \
-        --volume ${BIN}:/usr/local/src \
-        --workdir /usr/local/src \
+        --volume ${BIN}:/root \
+        --workdir /root \
         alpine:3.4 \
-        chmod 0500 VBoxManage
+        chmod 0500 init VBoxManage
 ```
 
 
@@ -90,16 +89,13 @@ vagrant(){
         --tty \
         --rm \
         --volume /var/run/docker.sock:/var/run/docker.sock:ro \
-        --volume ${WORK}:/usr/local/src \
-        --workdir /usr/local/src \
+        --volume ${WORK}:/root \
+        --workdir /root \
         --volume ${BIN}:/usr/local/bin:ro \
-        --volume ${VAGRANTD}:/root/.vagrant.d \
-        --volume ${CONFIG}:/root/.config \
         --env VAGRANT_DEFAULT_PROVIDER=virtualbox \
         --env WORK \
-        --env VAGRANTD \
-        --env VIRTUAL_BOX_VMS \
-        --env CONFIG \
+        --env DISPLAY \
+        --entrypoint bash \
         tidyrailroad/vagrant:0.0.0 \
         ${@}
 }
